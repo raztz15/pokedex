@@ -15,13 +15,13 @@ export const SearchPage = () => {
 
     const debounce = useDebounce(search, 500)
 
-
     const filteredResults = useMemo(() => {
         if (!data || debounce.trim().length < 2) return [];
         const q = debounce.trim().toLowerCase();
 
         return data.results.filter(p => p.name.toLowerCase().includes(q))
     }, [data, debounce])
+
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
     ) => {
@@ -44,6 +44,7 @@ export const SearchPage = () => {
                     </Typography>
 
                     <TextField
+                        autoFocus
                         size="small"
                         variant="outlined"
                         placeholder="Search Pokémon by name (min 2 letters)..."
@@ -51,7 +52,6 @@ export const SearchPage = () => {
                         onChange={handleChange}
                         slotProps={{
                             input: {
-
                                 endAdornment: search && (
                                     <IconButton
                                         size='small'
