@@ -15,7 +15,12 @@ export const RegionDashboard = () => {
     const totalPokemon = REGIONS[totalRegions - 1].endId;
 
     const handleSelect = (region: RegionConfig) => {
-        setSelectedRegion(region)
+        setSelectedRegion(region);
+        const regionsListElement = document.getElementById('regions-list')
+        if (regionsListElement) {
+            const bottom = regionsListElement?.offsetTop + regionsListElement?.offsetHeight;
+            window.scrollTo({ top: bottom, behavior: 'smooth' })
+        }
     }
 
     const handleBackToRegions = () => {
@@ -48,7 +53,7 @@ export const RegionDashboard = () => {
 
             </AppBar>
 
-            <Container maxWidth="lg" sx={{ py: 4 }}>
+            <Container id='regions-list' maxWidth="lg" sx={{ py: 4 }}>
                 <Typography variant="h4" fontWeight={700} gutterBottom>
                     Regions
                 </Typography>
