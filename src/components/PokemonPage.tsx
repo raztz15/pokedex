@@ -17,28 +17,11 @@ export const PokemonPage = () => {
 
     const { data: species } = useGetPokemonSpeciesQuery(pokemon?.id ?? idOrName ?? '')
 
-    // const saveFavorites = (ids: number[]) => {
-    //     localStorage.setItem(FAVORITE_KEY, JSON.stringify(ids))
-    // }
-
-    // const toggleFavorite = () => {
-    //     if (!pokemon) return;
-
-    //     setFavoriteIds(prev => {
-    //         const exists = prev.includes(pokemon.id);
-    //         const next = exists ?
-    //             prev.filter(id => id !== pokemon.id) :
-    //             [...prev, pokemon.id]
-    //         saveFavorites(next);
-    //         return next;
-    //     })
-    // }
-
     return (
         <Box
             // TODO ---> check the differences between vh % and px and all the use cases
             sx={{ minHeight: '100vh', bgcolor: '#fafafa' }}>
-            <AppBar position='static' elevation={2}>
+            <AppBar position='sticky' elevation={2}>
                 <Toolbar>
                     {/* Check what's inherit means */}
                     <IconButton edge='start' color='inherit' onClick={() => navigate(-1)} sx={{ mr: 1 }}>
