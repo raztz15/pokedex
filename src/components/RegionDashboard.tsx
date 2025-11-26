@@ -11,23 +11,19 @@ export const RegionDashboard = () => {
     const [selectedRegion, setSelectedRegion] = useState<RegionConfig | null>();
     const navigate = useNavigate()
 
+
+
     const totalRegions = REGIONS.filter(region => region.id !== 'special').length;
     const totalPokemon = REGIONS[totalRegions - 1].endId;
 
     const handleSelect = (region: RegionConfig) => {
         setSelectedRegion(region);
-        const regionsListElement = document.getElementById('regions-list')
-        if (regionsListElement) {
-            const bottom = regionsListElement?.offsetTop + regionsListElement?.offsetHeight;
-            window.scrollTo({ top: bottom, behavior: 'smooth' })
-        }
     }
 
     const handleBackToRegions = () => {
         window.scroll({ top: 0, behavior: 'smooth' })
         setSelectedRegion(null);
     }
-
 
     return (
         <Box sx={{

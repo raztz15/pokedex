@@ -1,10 +1,14 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useGetPokemonsQuery } from '../apis/Pokemon.api'
 import { Box, Button, Container, Grid, TextField, Toolbar, Typography } from '@mui/material';
 import { PokemonCard } from './PokemonCard';
 import { PokemonDetailDrawer } from './PokemonDetailDrawer';
 import type { RegionConfig } from '../interfaces/Regions';
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+
+
+
 
 
 interface PokemonsProps {
@@ -17,8 +21,45 @@ interface PokemonsProps {
 export const Pokemons = ({ limit, offset, region, onBackToRegions }: PokemonsProps) => {
     const [search, setSearch] = useState<string>('');
     const [selectedId, setSelectedId] = useState<string | null>(null);
+    const [showArrow, setShowArrow] = useState<boolean>(false);
+    const pokemonLIstRef = useRef<HTMLDivElement | null>(null)
 
     const { isLoading, error, data } = useGetPokemonsQuery({ offset, limit })
+
+    useEffect(() => {
+        if (!region) return;
+        if (!data) return;
+        const regionsListElement = document.getElementById('regions-list')
+        if (regionsListElement) {
+            const bottom = regionsListElement?.offsetTop + regionsListElement?.offsetHeight;
+            window.scrollTo({ top: bottom, behavior: 'smooth' })
+        }
+    }, [region, data])
+
+    useEffect(() => {
+        const handleScroll = () => {
+            if (!pokemonLIstRef.current) return;
+
+            const rect = pokemonLIstRef.current.getBoundingClientRect();
+            const threshold = 20;
+            console.log({ rect });
+            const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 20;
+            if (rect.top < -threshold) {
+                setShowArrow(true);
+            }
+            else if (atBottom) {
+                setShowArrow(false);
+            }
+            else {
+                setShowArrow(false);
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        handleScroll();
+
+        return () => window.removeEventListener('scroll', handleScroll)
+    }, [])
 
     // basic client-side filter for now
     const filteredResults = useMemo(() => {
@@ -35,6 +76,9 @@ export const Pokemons = ({ limit, offset, region, onBackToRegions }: PokemonsPro
     const handleCloseDrawer = () => {
         setSelectedId(null)
     }
+
+    console.log({ showArrow });
+
 
     return (
         <>
@@ -84,7 +128,7 @@ export const Pokemons = ({ limit, offset, region, onBackToRegions }: PokemonsPro
                     </Typography>
                 </Box>
             </Box>
-            <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
+            <Container ref={pokemonLIstRef} maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
                 <Box
                     sx={{
                         display: "flex",
@@ -112,7 +156,7 @@ export const Pokemons = ({ limit, offset, region, onBackToRegions }: PokemonsPro
                 {error && <Typography color="error">Failed to load Pokémons 🥲</Typography>}
 
                 {!isLoading && !error && data && (
-                    <Grid container spacing={2}>
+                    <Grid id='pokemon-list' container spacing={2}>
                         {filteredResults.map((p) => {
                             const segments = p.url.split("/").filter(Boolean);
                             const id = segments[segments.length - 1];
@@ -129,7 +173,26 @@ export const Pokemons = ({ limit, offset, region, onBackToRegions }: PokemonsPro
                         })}
                     </Grid>
                 )}
+                <ArrowDownwardIcon
+                    sx={{
+                        position: 'fixed',
+                        bottom: 16,
+                        left: '50%',
+                        cursor: 'pointer',
+                        transform: showArrow
+                            ? 'tanslateX(-50%) translateY(0)'
+                            : 'translateX(-50%) translateY(20px)',
+                        opacity: showArrow ? 1 : 0,
+                        transition: 'opacity 0.35s ease-out, transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1)',
+                        pointerEvents: showArrow ? 'auto' : 'none',
+                    }}
+                    onClick={() => window.scrollTo({
+                        top: document.body.offsetHeight, behavior: 'smooth'
+                    })}
+                    fontSize='large'
+                />
             </Container>
+
 
             {selectedId && <PokemonDetailDrawer
                 selectedId={selectedId}
